@@ -45,15 +45,18 @@ solve1 s acc =
         acc' = maybeAdd acc res
     in solve1 rest acc'
 
-findFirstEnabled :: String -> String
-findFirstEnabled s
-    | take 7 s == "don't()" = ""
-    | otherwise = head s : findFirstEnabled (tail s)
+data Condition = Enabled | Disabled deriving (Eq)
 
-solve2 :: String -> Maybe Integer -> Maybe Integer
-solve2 = undefined
+filterDisabled :: String -> Condition -> String
+filterDisabled "" _ = ""
+filterDisabled s state
+    | take 4 s == "do()" = filterDisabled (drop 4 s) Enabled
+    | take 7 s == "don't()" = filterDisabled (drop 7 s) Disabled
+    | state == Enabled = head s : filterDisabled (tail s) Enabled
+    | otherwise = filterDisabled (tail s) Disabled
 
 main :: IO()
 main = do
     input <- parseInput "input.txt"
     print $ solve1 input Nothing
+    print $ solve1 (filterDisabled input Enabled) Nothing
