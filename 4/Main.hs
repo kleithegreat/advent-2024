@@ -61,7 +61,27 @@ solve1 g = sum $ map countXmas extracted where
                 [getNegDiagonal g i 0 | i <- [1..m]]
         negRevDiags = map reverse negDiags
 
+hasMAS :: String -> Bool
+hasMAS "" = False
+hasMAS ('M':'A':'S':_) = True
+hasMAS ('S':'A':'M':_) = True
+hasMAS (x:xs) = hasMAS xs
+
+isXMAS :: [String] -> Int -> Int -> Bool
+isXMAS g i j
+    | i <= 0 || i >= length g - 1 || j <= 0 || j >= length (head g) - 1 = False
+    | g !! i !! j /= 'A' = False
+    | otherwise = (hasMAS diag1 || hasMAS (reverse diag1)) && (hasMAS diag2 || hasMAS (reverse diag2)) where
+        diag1 = [g !! (i-1) !! (j-1), g !! i !! j, g !! (i+1) !! (j+1)]
+        diag2 = [g !! (i-1) !! (j+1), g !! i !! j, g !! (i+1) !! (j-1)]
+
+solve2 :: [String] -> Int
+solve2 g = sum [1 | i <- [1..length g - 2], 
+                    j <- [1..length (head g) - 2], 
+                    isXMAS g i j]
+
 main :: IO()
 main = do
     input <- parseInput "input.txt"
     print $ solve1 input
+    print $ solve2 input
