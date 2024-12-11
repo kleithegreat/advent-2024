@@ -19,8 +19,22 @@ isSolvable t (x:xs) = t `Set.member` foldl nextVals (Set.singleton x) xs
 solve1 :: [(Integer, [Integer])] -> Integer
 solve1 a = sum [t | (t, vals) <- a, isSolvable t vals]
 
+cat :: Integer -> Integer -> Integer
+cat a b = a * (10 ^ (length $ show b)) + b
+
+nextVals' :: Set.Set Integer -> Integer -> Set.Set Integer
+nextVals' s n = Set.unions [Set.map (+n) s, Set.map (*n) s, Set.map (`cat` n) s]
+
+isSolvable' :: Integer -> [Integer] -> Bool
+isSolvable' _ [] = False
+isSolvable' t (x:xs) = t `Set.member` foldl nextVals' (Set.singleton x) xs
+
+solve2 :: [(Integer, [Integer])] -> Integer
+solve2 a = sum [t | (t, vals) <- a, isSolvable' t vals]
+
 main :: IO()
 main = do
     contents <- readFile "input.txt"
     let input = lines contents
     print $ solve1 $ parseInput input
+    print $ solve2 $ parseInput input
